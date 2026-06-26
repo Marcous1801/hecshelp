@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HECSHelp — Pay off your student debt with spare change</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Syne:wght@700;800&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #0c0c1a;
+    --ink-soft: #4a4a6a;
+    --ink-muted: #9090b0;
+    --surface: #f5f4ff;
+    --white: #ffffff;
+    --violet: #5b4fff;
+    --violet-light: #ebe9ff;
+    --violet-dark: #3d34cc;
+    --green: #00c07a;
+    --green-light: #e0faf1;
+    --radius: 14px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--white);
+    color: var(--ink);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 40px;
+    background: rgba(255,255,255,0.88);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(91,79,255,0.1);
+    z-index: 100;
+  }
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    color: var(--ink);
+    text-decoration: none;
+    letter-spacing: -0.5px;
+  }
+  .nav-logo span { color: var(--violet); }
+  .nav-cta {
+    background: var(--violet);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    text-decoration: none;
+    transition: background 0.15s;
+  }
+  .nav-cta:hover { background: var(--violet-dark); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 120px 24px 80px;
+    background: var(--white);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -120px; left: 50%; transform: translateX(-50%);
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(91,79,255,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--violet-light);
+    color: var(--violet);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 14px;
+    border-radius: 20px;
+    margin-bottom: 28px;
+    letter-spacing: 0.2px;
+  }
+  .eyebrow-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--violet); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.85)} }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(38px, 6vw, 68px);
+    line-height: 1.05;
+    letter-spacing: -2px;
+    color: var(--ink);
+    max-width: 780px;
+    margin-bottom: 22px;
+  }
+  .hero h1 .accent { color: var(--violet); }
+
+  .hero p {
+    font-size: clamp(16px, 2vw, 19px);
+    color: var(--ink-soft);
+    max-width: 520px;
+    margin-bottom: 44px;
+    line-height: 1.65;
+  }
+
+  .signup-form {
+    display: flex;
+    gap: 10px;
+    max-width: 440px;
+    width: 100%;
+    margin-bottom: 18px;
+  }
+  .signup-form input {
+    flex: 1;
+    padding: 14px 18px;
+    border: 1.5px solid #ddd;
+    border-radius: 10px;
+    font-size: 15px;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    transition: border 0.15s;
+    color: var(--ink);
+  }
+  .signup-form input:focus { border-color: var(--violet); }
+  .signup-form input::placeholder { color: var(--ink-muted); }
+  .signup-form button {
+    background: var(--violet);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 14px 22px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    white-space: nowrap;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .signup-form button:hover { background: var(--violet-dark); }
+  .signup-form button:active { transform: scale(0.98); }
+
+  .hero-sub {
+    font-size: 13px;
+    color: var(--ink-muted);
+  }
+  .hero-sub strong { color: var(--ink-soft); }
+
+  /* TICKER / social proof */
+  .ticker {
+    margin-top: 60px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--ink-muted);
+  }
+  .avatars {
+    display: flex;
+  }
+  .avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 2px solid #fff;
+    margin-left: -8px;
+    font-size: 11px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+  }
+  .avatar:first-child { margin-left: 0; }
+  .av1 { background: #7c6dff; }
+  .av2 { background: #00c07a; }
+  .av3 { background: #ff6b6b; }
+  .av4 { background: #ffbb33; }
+
+  /* DEMO WIDGET */
+  .demo-section {
+    padding: 100px 24px;
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .section-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--violet);
+    margin-bottom: 14px;
+  }
+  .demo-section h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    text-align: center;
+    color: var(--ink);
+    max-width: 560px;
+    margin-bottom: 14px;
+  }
+  .demo-section > p {
+    font-size: 16px;
+    color: var(--ink-soft);
+    text-align: center;
+    max-width: 440px;
+    margin-bottom: 52px;
+  }
+
+  .demo-card {
+    background: var(--white);
+    border-radius: 20px;
+    border: 1px solid rgba(91,79,255,0.12);
+    padding: 32px;
+    max-width: 480px;
+    width: 100%;
+  }
+  .demo-title { font-size: 13px; font-weight: 600; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 20px; }
+
+  .txn-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f8;
+  }
+  .txn-item:last-of-type { border-bottom: none; }
+  .txn-left { display: flex; align-items: center; gap: 12px; }
+  .txn-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: var(--violet-light);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .txn-name { font-size: 14px; font-weight: 500; color: var(--ink); }
+  .txn-amt { font-size: 12px; color: var(--ink-muted); margin-top: 2px; }
+  .txn-roundup { font-size: 14px; font-weight: 600; color: var(--violet); }
+
+  .demo-total {
+    margin-top: 20px;
+    background: var(--violet-light);
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .demo-total-label { font-size: 14px; color: var(--violet); font-weight: 500; }
+  .demo-total-val { font-size: 22px; font-weight: 700; color: var(--violet); font-family: 'Syne', sans-serif; }
+
+  .demo-bar-wrap { margin-top: 16px; }
+  .demo-bar-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--ink-muted); margin-bottom: 6px; }
+  .demo-bar-track { background: #e8e8f4; border-radius: 6px; height: 8px; overflow: hidden; }
+  .demo-bar-fill { height: 8px; border-radius: 6px; background: var(--violet); transition: width 0.8s ease; }
+  .demo-note { font-size: 12px; color: var(--ink-muted); margin-top: 8px; text-align: center; }
+
+  /* HOW IT WORKS */
+  .how-section {
+    padding: 100px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .how-section h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    text-align: center;
+    color: var(--ink);
+    margin-bottom: 60px;
+  }
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 24px;
+    max-width: 860px;
+    width: 100%;
+  }
+  .step {
+    background: var(--white);
+    border: 1px solid #eeeeff;
+    border-radius: var(--radius);
+    padding: 28px 24px;
+  }
+  .step-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--violet-light);
+    line-height: 1;
+    margin-bottom: 16px;
+  }
+  .step h3 { font-size: 16px; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
+  .step p { font-size: 14px; color: var(--ink-soft); line-height: 1.6; }
+
+  /* WHY HECSHELP */
+  .why-section {
+    padding: 80px 24px;
+    background: var(--ink);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .why-section h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    text-align: center;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+  .why-section > p {
+    font-size: 16px;
+    color: rgba(255,255,255,0.5);
+    text-align: center;
+    max-width: 440px;
+    margin-bottom: 52px;
+  }
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1px;
+    max-width: 720px;
+    width: 100%;
+    background: rgba(255,255,255,0.08);
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .stat {
+    background: var(--ink);
+    padding: 32px 28px;
+    text-align: center;
+  }
+  .stat-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 38px;
+    font-weight: 800;
+    color: var(--violet);
+    letter-spacing: -1px;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .stat-label { font-size: 13px; color: rgba(255,255,255,0.45); line-height: 1.4; }
+
+  /* CTA */
+  .cta-section {
+    padding: 100px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    background: var(--white);
+  }
+  .cta-section h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(30px, 5vw, 52px);
+    font-weight: 800;
+    letter-spacing: -2px;
+    color: var(--ink);
+    max-width: 620px;
+    margin-bottom: 18px;
+    line-height: 1.1;
+  }
+  .cta-section p {
+    font-size: 16px;
+    color: var(--ink-soft);
+    max-width: 420px;
+    margin-bottom: 40px;
+  }
+
+  /* SUCCESS STATE */
+  .success-msg {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    background: var(--green-light);
+    color: #006644;
+    border-radius: 10px;
+    padding: 14px 20px;
+    font-size: 15px;
+    font-weight: 500;
+    max-width: 440px;
+    width: 100%;
+    justify-content: center;
+  }
+  .success-msg.show { display: flex; }
+  .check { width: 22px; height: 22px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; flex-shrink: 0; }
+
+  /* FOOTER */
+  footer {
+    padding: 32px 40px;
+    border-top: 1px solid #eeeeff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .footer-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 16px;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .footer-logo span { color: var(--violet); }
+  footer p { font-size: 13px; color: var(--ink-muted); }
+
+  @media (max-width: 600px) {
+    nav { padding: 14px 20px; }
+    .signup-form { flex-direction: column; }
+    footer { flex-direction: column; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="#">HECS<span>Help</span></a>
+  <a class="nav-cta" href="#waitlist">Join the waitlist</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="eyebrow">
+    <div class="eyebrow-dot"></div>
+    Now accepting early signups
+  </div>
+  <h1>Pay off your HECS<br>with your <span class="accent">spare change</span></h1>
+  <p>Every time you buy a coffee or tap your card, HECSHelp rounds up to the nearest dollar and puts the difference toward your student debt. Automatically.</p>
+
+  <div class="signup-form" id="hero-form">
+    <input type="email" id="hero-email" placeholder="your@email.com" />
+    <button onclick="signup('hero-email', 'hero-success')">Join waitlist</button>
+  </div>
+  <div class="success-msg" id="hero-success">
+    <div class="check">✓</div>
+    You're on the list — we'll be in touch soon.
+  </div>
+  <p class="hero-sub"><strong>Free to join.</strong> No credit card required.</p>
+
+  <div class="ticker">
+    <div class="avatars">
+      <div class="avatar av1">AK</div>
+      <div class="avatar av2">JL</div>
+      <div class="avatar av3">MR</div>
+      <div class="avatar av4">SW</div>
+    </div>
+    &nbsp;Join <strong style="color:var(--ink-soft)">240+ Australians</strong>&nbsp;already on the waitlist
+  </div>
+</section>
+
+<!-- DEMO -->
+<section class="demo-section" id="how">
+  <div class="section-label">See it in action</div>
+  <h2>A week of coffees and groceries</h2>
+  <p>Here's what round-ups from a real week of spending look like — tiny amounts that add up fast.</p>
+
+  <div class="demo-card">
+    <div class="demo-title">This week's transactions</div>
+
+    <div class="txn-item">
+      <div class="txn-left">
+        <div class="txn-icon">☕</div>
+        <div><div class="txn-name">Seven Seeds</div><div class="txn-amt">$5.50 spent</div></div>
+      </div>
+      <div class="txn-roundup">+$0.50</div>
+    </div>
+    <div class="txn-item">
+      <div class="txn-left">
+        <div class="txn-icon">🛒</div>
+        <div><div class="txn-name">Woolworths</div><div class="txn-amt">$67.35 spent</div></div>
+      </div>
+      <div class="txn-roundup">+$0.65</div>
+    </div>
+    <div class="txn-item">
+      <div class="txn-left">
+        <div class="txn-icon">🚌</div>
+        <div><div class="txn-name">Opal card top-up</div><div class="txn-amt">$20.00 spent</div></div>
+      </div>
+      <div class="txn-roundup">+$1.00</div>
+    </div>
+    <div class="txn-item">
+      <div class="txn-left">
+        <div class="txn-icon">🍜</div>
+        <div><div class="txn-name">Guzman y Gomez</div><div class="txn-amt">$14.80 spent</div></div>
+      </div>
+      <div class="txn-roundup">+$0.20</div>
+    </div>
+    <div class="txn-item">
+      <div class="txn-left">
+        <div class="txn-icon">⛽</div>
+        <div><div class="txn-name">BP Fuel</div><div class="txn-amt">$88.42 spent</div></div>
+      </div>
+      <div class="txn-roundup">+$0.58</div>
+    </div>
+
+    <div class="demo-total">
+      <div class="demo-total-label">→ sent to your HECS this week</div>
+      <div class="demo-total-val">$2.93</div>
+    </div>
+
+    <div class="demo-bar-wrap">
+      <div class="demo-bar-label">
+        <span>Progress toward $5 transfer</span>
+        <span>59%</span>
+      </div>
+      <div class="demo-bar-track">
+        <div class="demo-bar-fill" style="width: 59%;"></div>
+      </div>
+      <div class="demo-note">Sends automatically once you hit $5</div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section">
+  <div class="section-label">How it works</div>
+  <h2>Three steps, zero effort</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <h3>Link your bank</h3>
+      <p>Connect your everyday spending account. We use read-only access — we can see your transactions but never touch your money without permission.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <h3>Spend normally</h3>
+      <p>Every purchase gets rounded up to the nearest dollar. We track the difference silently in the background — no action needed from you.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <h3>Watch debt shrink</h3>
+      <p>Once your round-ups hit $5, we send a BPAY payment directly to your HECS account. You get a notification. That's it.</p>
+    </div>
+  </div>
+</section>
+
+<!-- WHY SECTION -->
+<section class="why-section">
+  <div class="section-label" style="color: rgba(255,255,255,0.35);">The HECS reality</div>
+  <h2>Australians are sitting on a mountain of student debt</h2>
+  <p>The average HECS debt keeps growing every year with indexation. Small, consistent payments are the most painless way to fight back.</p>
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-val">$26k</div>
+      <div class="stat-label">Average HECS debt per Australian graduate</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">3.2M</div>
+      <div class="stat-label">Australians with an active HECS balance</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">4.7%</div>
+      <div class="stat-label">Indexation rate applied to your debt each June</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA / WAITLIST -->
+<section class="cta-section" id="waitlist">
+  <div class="section-label">Early access</div>
+  <h2>Be first when we launch</h2>
+  <p>We're building HECSHelp now. Join the waitlist and we'll reach out as soon as we're ready — early members get 3 months free.</p>
+
+  <div class="signup-form" id="cta-form">
+    <input type="email" id="cta-email" placeholder="your@email.com" />
+    <button onclick="signup('cta-email', 'cta-success')">Claim my spot</button>
+  </div>
+  <div class="success-msg" id="cta-success">
+    <div class="check">✓</div>
+    You're on the list — we'll be in touch soon.
+  </div>
+  <p class="hero-sub" style="margin-top:12px;">Free to join. Unsubscribe any time.</p>
+</section>
+
+<footer>
+  <a class="footer-logo" href="#">HECS<span>Help</span></a>
+  <p>© 2026 HECSHelp. Built for Australians with student debt.</p>
+  <p style="font-size:12px; color:#aaa;">Not financial advice. HECSHelp is currently in development.</p>
+</footer>
+
+<script>
+  function signup(inputId, successId) {
+    const input = document.getElementById(inputId);
+    const success = document.getElementById(successId);
+    const email = input.value.trim();
+    if (!email || !email.includes('@')) {
+      input.style.borderColor = '#ff6b6b';
+      input.focus();
+      setTimeout(() => input.style.borderColor = '', 1500);
+      return;
+    }
+    const formId = inputId === 'hero-email' ? 'hero-form' : 'cta-form';
+    document.getElementById(formId).style.display = 'none';
+    success.classList.add('show');
+  }
+</script>
+
+</body>
+</html>
